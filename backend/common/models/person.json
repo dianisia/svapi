@@ -1,0 +1,32 @@
+{
+  "name": "person",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "firstName": {
+      "type": "string",
+      "required": true
+    },
+    "lastName": {
+      "type": "string",
+      "required": true
+    },
+    "vkId": {
+      "type": "number",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {
+    "faces": {
+      "type": "hasMany",
+      "model": "face",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

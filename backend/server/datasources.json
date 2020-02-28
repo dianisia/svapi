@@ -1,0 +1,13 @@
+{
+  "db": {
+    "host": "",
+    "port": 0,
+    "url": "mongodb+srv://admin:adminroot@cluster0-r5nbv.mongodb.net/test?retryWrites=true&w=majority",
+    "database": "Cluster0",
+    "password": "",
+    "name": "db",
+    "user": "",
+    "useNewUrlParser": true,
+    "connector": "mongodb"
+  }
+}
