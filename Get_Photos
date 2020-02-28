@@ -1,0 +1,83 @@
+import vk
+import os
+import requests
+import time
+import traceback
+import ctypes
+from urllib.parse import parse_qs
+
+
+
+def GetAcsessToken(app_id):
+    if os.listdir().count('access_token.dat'):
+        r = open('access_token.dat')
+        acsess_token = r.read()
+        r.close()
+        kernel32 = ctypes.windll.kernel32
+        attr = kernel32.GetFileAttributesW('access_token.dat')
+        kernel32.SetFileAttributesW('access_token.dat', attr | 2)
+
+    else:
+        auth_url = ("https://oauth.vk.com/authorize?client_id={app_id}&display=page&redirect_uri="
+                    "https://oauth.vk.com/blank.html&scope="
+                    "friends,photos,audio,video,docs,"
+                    "notes,wall,groups, offline"
+                    "&response_type=token&v=5.92&state=42".format(app_id=app_id))
+        wb.open_new_tab(auth_url)
+        redirected_url = input("Paste here url you were redirected:\n")
+        aup = parse_qs(redirected_url)
+        aup['access_token'] = aup.pop('https://oauth.vk.com/blank.html#access_token')
+        s = open('access_token.dat', 'w')
+        s.write(aup['access_token'][0])
+        s.close()
+        kernel32 = ctypes.windll.kernel32
+        attr = kernel32.GetFileAttributesW('access_token.dat')
+        kernel32.SetFileAttributesW('access_token.dat', attr | 2)
+        acsess_token = aup['access_token'][0]
+    return acsess_token
+
+def GetPhotos(api, user_id):
+    try:
+        Photo = api.photos.get(owner_id=user_id, album_id='profile',count=1000)['items']
+        #print(Photo)
+        user = api.users.get(user_ids=user_id)
+
+        path = 'Photos' + '_' + user[0]['first_name'] + '_' + user[0]['last_name'] + \
+                       '_' + str(user_id) + '_time' + time.strftime('%Y_%m_%d_%H_%M')
+        os.mkdir(path)
+        #print(path)
+        os.chdir(path)
+        f=open(str(user_id) + '_' +'.txt','w')
+        if Photo != []:           
+            for i in range(len(Photo)):		
+                f=open(str(i)+'.jpg','wb')
+                try:
+                    ufr = requests.get((Photo[i]['sizes'][6]['url']))
+                except:
+                    ln = len(Photo[i]['sizes'])
+                    ufr = requests.get(Photo[i]['sizes'][ln-1]['url'])
+                f.write(ufr.content)
+                f.close()
+                
+                f=open(str(user_id) + '_' +'.txt','a')
+                f.write(Photo[i]['sizes'][len(Photo[i]['sizes'])-1]['url']+'\n')
+                f.close()
+                
+
+                
+        os.chdir('..\\')
+    except vk.exceptions.VkAPIError as err:
+        print('Warning: {}'.format(err.message))
+
+def main():
+	app_id = 6231475
+	access_token = GetAcsessToken(app_id)
+	session = vk.Session(access_token=access_token)
+	api = vk.API(session, v='5.85', lang='ru', timeout=120)
+	UsersList = api.groups.getMembers(group_id=171560960)['items']
+	for i in range(len(UsersList)):		
+		GetPhotos(api, UsersList[i])
+	# GetPhotos(api,6756521)
+
+        
+main()
