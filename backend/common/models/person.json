@@ -17,6 +17,9 @@
     "vkId": {
       "type": "number",
       "required": true
+    },
+    "nickname": {
+      "type": "string"
     }
   },
   "validations": [],
